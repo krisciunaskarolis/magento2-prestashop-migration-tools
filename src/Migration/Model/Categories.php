@@ -53,7 +53,7 @@ class Categories extends AbstractImport
                 'meta_title',
                 'meta_keywords',
                 'meta_description',
-                
+                'image',
             ]
         );
         $this->optionsResolver->setDefaults(
@@ -68,7 +68,8 @@ class Categories extends AbstractImport
                 'meta_keywords' => '',
                 'meta_description' => '',
                 'store' => 0,
-                'is_root_category' => 0
+                'is_root_category' => 0,
+                'image' => '',
             ]
         );
         $this->configureAllowedValuesForStoreOptions();
@@ -137,7 +138,7 @@ class Categories extends AbstractImport
      */
     protected function prepareData(&$row)
     {
-        if (!isset($row['meta_title']) || $row['meta_title'] = '') {
+        if (!isset($row['meta_title']) || $row['meta_title'] == '') {
             $row['meta_title'] = $row['name'];
         }
         if (!isset($row['level'])) {
@@ -177,8 +178,8 @@ class Categories extends AbstractImport
                     $category->setStoreId($row['store']);
                     $category->setLevel($row['level']);
                     $category->setCustomAttributes($row);
-                    if (isset($row['parent']) && $prestaCats[$row['parent']]) {
-                        $parent = $prestaCats[$row['parent']];
+                    if (isset($row['parent_id']) && isset($this->categories[$row['parent_id']])) {
+                        $parent = $this->categories[$row['parent_id']];
                     }  else {
                         $parent = 2;
                     }
@@ -191,7 +192,6 @@ class Categories extends AbstractImport
                 $category->setMetaDescription($row['meta_description']);
                 $category->setName($row['name']);
                 $category->setDescription($row['description']);
-                $category->setPrestaId($row['presta_id']);
                 $this->saveCategoryWithUrlKey($category, $row['url_key'], $row['url_key']);
                 if ($category && $category->getId()) {
                     $this->categories[$row['presta_id']] = $category->getId();
